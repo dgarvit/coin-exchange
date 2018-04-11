@@ -1,0 +1,21 @@
+{
+  "name": "coin-exchange",
+  "homepage": "https://github.com/dgarvit/coin-exchange",
+  "authors": [
+    "Garvit Dewan <d.garvit@gmail.com>"
+  ],
+  "description": "Webapp to calculate the profit and loss on user specified amount of bitcoin or ethereum",
+  "main": "",
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular": "angularjs#^1.6.9"
+  }
+}

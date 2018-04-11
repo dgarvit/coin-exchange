@@ -1,4 +1,4 @@
 venv/
-bower_components/
+app/static/bower_components/
 *.pyc
 db.sqlite3

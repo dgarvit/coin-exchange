@@ -2,25 +2,48 @@
 <html>
 <head>
 	<title>Coin Exchange</title>
+	{% include 'scripts.html' %}
 </head>
 <body>
-	<div>
+	<div ng-app="coinex" ng-controller="myController">
 		<div>
-			<div>
-				<div>
-					<div>
+			<div id="error"></div>
+			{% block table1 %}
+			<div class="table">
+				<div class="table-1-row">
+					<div class="table-1-col">
 						Currency: 
 						<select id="currency">
 							<option value="bitcoin">Bitcoin (BTC)</option>
 							<option value="ethereum">Ethereum (ETH)</option>
 						</select>
 					</div>
+					<div class="table-1-col">
+						Purchase date: <input type="date" ng-model="purchase_date" max="{{ today }}">
+					</div>
+				</div>
+
+				<div class="table-1-row">
+					<div class="table-1-col">
+						Amount: <input id="amount" type="number" ng-model="amount">
+					</div>
+					<div>
+						Sell Date: <input type="date" ng-model="sell_date" max="{{ today }}">
+					</div>
+				</div>
+				<button ng-click="calculate()">Calculate</button>
+			</div>
+			{% endblock %}
+
+			{% block table2 %}
+			<div class="table">
+				<div id="profit">
+					{% verbatim %}
+					{{ profit }}
+					{% endverbatim %}
 				</div>
 			</div>
-
-			<div>
-				
-			</div>
+			{% endblock %}
 		</div>
 	</div>
 </body>
