@@ -12,23 +12,32 @@
 			<div class="table">
 				<div class="table-1-row">
 					<div class="table-1-col">
-						Currency: 
-						<select id="currency">
-							<option value="bitcoin">Bitcoin (BTC)</option>
-							<option value="ethereum">Ethereum (ETH)</option>
+						Cryptocurrency: 
+						<select id="coin" ng-model="coin" ng-change="calculate()">
+							<option value="BTC" selected>Bitcoin (BTC)</option>
+							<option value="ETH">Ethereum (ETH)</option>
 						</select>
 					</div>
 					<div class="table-1-col">
-						Purchase date: <input type="date" ng-model="purchase_date" max="{{ today }}">
+						Currency: 
+						<select id="currency" ng-model="currency" ng-change="changeSymbol();calculate()">
+							<option value="EUR">EUR</option>
+							<option value="INR">INR</option>
+							<option value="JPY">JPY</option>
+							<option value="USD" selected>USD</option>
+						</select>
+					</div>
+					<div class="table-1-col">
+						Purchase date: <input type="date" ng-model="purchase_date" max="{{ today }}" ng-change="calculate()">
 					</div>
 				</div>
 
 				<div class="table-1-row">
 					<div class="table-1-col">
-						Amount: <input id="amount" type="number" ng-model="amount">
+						Amount: <input id="amount" type="number" ng-model="amount" ng-change="calculate()">
 					</div>
 					<div>
-						Sell Date: <input type="date" ng-model="sell_date" max="{{ today }}">
+						Sell Date: <input type="date" ng-model="sell_date" max="{{ today }}" ng-change="calculate()">
 					</div>
 				</div>
 				<button ng-click="calculate()">Calculate</button>
@@ -39,7 +48,13 @@
 			<div class="table">
 				<div id="profit">
 					{% verbatim %}
-					{{ profit }}
+					{{ symbol }} {{ profit }}
+				</div>
+				<div id="info">
+					<p>You bought {{ amount }} {{ coin }} @ {{ purchase_price }} Price worth {{ symbol }} {{ amount * purchase_price }}</p>
+					<p>You sold {{ amount }} {{ coin }} @ {{ sell_price }} Price worth {{ symbol }} {{ amount * sell_price }}</p>
+					<p>Your {{ proloss }} is {{ symbol }} {{ profit | makePositive }}</p>
+					<p>Your tax on this profit will be {{ symbol }} {{ tax }}</p>
 					{% endverbatim %}
 				</div>
 			</div>
