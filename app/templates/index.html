@@ -1,23 +1,24 @@
+{% load static %}
 <!DOCTYPE html>
 <html>
 <head>
 	<title>Coin Exchange</title>
 	{% include 'scripts.html' %}
+	<link rel="stylesheet" type="text/css" href="{% static 'css/index.css' %}">
 </head>
 <body>
 	<div ng-app="coinex" ng-controller="myController">
-		<div>
-			<div id="error"></div>
+		<div class="container">
 			{% block table1 %}
 			<div class="table">
+				<div class="table-1-col">
+					Cryptocurrency: 
+					<select id="coin" ng-model="coin" ng-change="calculate()">
+						<option value="BTC" selected>Bitcoin (BTC)</option>
+						<option value="ETH">Ethereum (ETH)</option>
+					</select>
+				</div>
 				<div class="table-1-row">
-					<div class="table-1-col">
-						Cryptocurrency: 
-						<select id="coin" ng-model="coin" ng-change="calculate()">
-							<option value="BTC" selected>Bitcoin (BTC)</option>
-							<option value="ETH">Ethereum (ETH)</option>
-						</select>
-					</div>
 					<div class="table-1-col">
 						Currency: 
 						<select id="currency" ng-model="currency" ng-change="changeSymbol();calculate()">
@@ -40,15 +41,17 @@
 						Sell Date: <input type="date" ng-model="sell_date" max="{{ today }}" ng-change="calculate()">
 					</div>
 				</div>
-				<button ng-click="calculate()">Calculate</button>
+				<div class="cal">
+					<button ng-click="calculate()">Calculate</button>
+				</div>
 			</div>
 			{% endblock %}
 
 			{% block table2 %}
-			<div class="table">
+			<div class="table" id="table2">
 				<div id="profit">
 					{% verbatim %}
-					{{ symbol }} {{ profit }}
+					{{ sign }} {{ symbol }} {{ profit | makePositive }}
 				</div>
 				<div id="info">
 					<p>You bought {{ amount }} {{ coin }} @ {{ purchase_price }} Price worth {{ symbol }} {{ amount * purchase_price }}</p>

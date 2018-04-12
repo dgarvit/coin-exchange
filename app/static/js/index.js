@@ -65,8 +65,11 @@ app.controller('myController', function ($scope, $http, $q) {
 			getPriceOn($scope.sell_date, function(response) {
 				$scope.sell_price = response;
 				$scope.profit = ($scope.sell_price - $scope.purchase_price) * $scope.amount;
+				$scope.profit = Math.round($scope.profit * 100) / 100;
 				$scope.tax = ($scope.profit > 0) ? ($scope.profit * 0.3) : 0;
-				$scope.proloss = ($scope.profit > 0) ? "profit" : "loss";
+				$scope.tax = Math.round($scope.tax * 100) / 100;
+				$scope.proloss = ($scope.profit >= 0) ? "profit" : "loss";
+				$scope.sign = ($scope.profit >= 0) ? "+" : "-";
 			});
 		});
 	};
