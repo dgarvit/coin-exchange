@@ -1,70 +1,105 @@
 var app = angular.module('coinex', []);
-app.controller('myController', function ($scope, $http) {
+app.controller('myController', function ($scope, $http, $q) {
 	$scope.profit = 0;
-	var start = new Date();
-	var start_string;
-	var end_string;
-	var end = new Date();
-	var price;
+	var purchase_date, purchase_price;
+	var sell_date, sell_price;
+	var currency, coin;
 
 	var dateToString = function(date) {
-		var tzoffset = date.getTimezoneOffset() * 60000; //offset in milliseconds
+		var tzoffset = date.getTimezoneOffset() * 60000;
 		var localISOTime = (new Date(date - tzoffset)).toISOString().substring(0, 10);
 		return localISOTime;
 	};
 
-	var setDates = function() {
-		start_string = dateToString($scope.purchase_date);
-		end_string = dateToString($scope.sell_date);
+	var toTimestamp = function(strDate) {
+		var datum = Date.parse(strDate);
+		return datum/1000;
 	}
-	
-	var retreiveTable = function(callback) {
-		$http.get('https://api.coindesk.com/v1/bpi/historical/close.json', {
+
+	var getPriceOn = function(date) {
+		var def = $q.defer();
+		$http.get('https://min-api.cryptocompare.com/data/dayAvg', {
 			params: {
-				'start': start_string,
-				'end': end_string,
+				fsym: $scope.coin,
+				tsym: $scope.currency,
+				toTs: toTimestamp(date),
 			}
-		}).then(function(data) {
-			price = data.data.bpi;
-			console.log(price);
-			callback();
+		}).then(function(response) {
+			def.resolve(response.data[currency]);
 		});
-	};
+		return def.promise;
+	}
 
-	var calculate_profit = function() {
-		console.log(end_string);
-		console.log(start_string);
-		console.log(price);
-		console.log(price[end_string]);
-		console.log(price[start_string]);
-		return (price[end_string] - price[start_string]) * $scope.amount;
-	};
-
-	$scope.calculate = function() {
-		console.log($scope.purchase_date);
-		console.log(dateToString($scope.purchase_date));	
+	var setValues = function() {
+		//var deferred = $q.defer();
+		var purchaseFlag = false, sellFlag = false;
 		if ($scope.amount === undefined || $scope.amount < 0) {
-			document.getElementById('error').innerHTML = "Please enter a valid amount.";
 			throw("Amount is invalid or not defined.");
 		}
 
 		if ($scope.purchase_date === undefined || $scope.sell_date === undefined) {	
-			document.getElementById('error').innerHTML = "Please enter a valid date.";
 			throw("Date not defined.");
 		}
 
-		if ((start > $scope.purchase_date) || (end < $scope.sell_date)) {
-			start = $scope.purchase_date;
-			end = $scope.sell_date;
-			setDates();
-			retreiveTable(function() {
-				$scope.profit = calculate_profit();
+		if (purchase_date !== $scope.purchase_date) {
+			purchase_date = $scope.purchase_date;
+			getPriceOn(purchase_date)
+			.then(function(response) {
+				purchase_price = response;
+				console.log(purchase_price);
+				purchaseFlag = true;
 			});
 		}
-		else {
-			setDates();
-			$scope.profit = calculate_profit();
+
+		if (sell_date !== $scope.sell_date) {
+			sell_date = $scope.sell_date;
+			getPriceOn(sell_date)
+			.then(function(response) {
+				sell_price = response;
+				sellFlag = true;
+			});
 		}
-		//$scope.$apply();
+
+		if (currency !== $scope.currency) {
+			currency = $scope.currency;
+			if (!purchaseFlag) {
+				getPriceOn(purchase_date)
+				.then(function(response) {
+					purchase_price = response;
+					purchaseFlag = true;
+				});
+			}
+
+			if (!sellFlag) {
+				getPriceOn(sell_date)
+				.then(function(response) {
+					sell_price = response;
+					sellFlag = true;
+				});
+			}
+		}
+
+		if (coin !== $scope.coin) {
+			coin = $scope.coin;
+			if (!purchaseFlag) {
+				getPriceOn(purchase_date, function(response) {
+					purchase_price = response;
+					purchaseFlag = true;
+				});
+			}
+
+			if (!sellFlag) {
+				getPriceOn(sell_date, function(response) {
+					sell_price = response;
+					sellFlag = true;
+				});
+			}
+		}
+		console.log(deferred.promise);
+		//return deferred.promise;
+	};
+
+	$scope.calculate = function() {
+		setValues();
 	};
 });
